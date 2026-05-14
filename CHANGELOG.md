@@ -1,0 +1,91 @@
+# Changelog
+
+## [3.9.0](https://github.com/mshick/add-pr-comment/compare/v3.8.0...v3.9.0) (2026-03-14)
+
+
+### Features
+
+* add library exports for programmatic usage ([#169](https://github.com/mshick/add-pr-comment/issues/169)) ([277cebd](https://github.com/mshick/add-pr-comment/commit/277cebd817f74153d8c88986b77f0e75976e00af))
+
+## [3.8.0](https://github.com/mshick/add-pr-comment/compare/v3.7.0...v3.8.0) (2026-03-14)
+
+
+### Features
+
+* automatic message truncation for oversized comments ([#167](https://github.com/mshick/add-pr-comment/issues/167)) ([38989f3](https://github.com/mshick/add-pr-comment/commit/38989f396057a576bf9584d56295f40c6e4bd1df))
+
+## [3.7.0](https://github.com/mshick/add-pr-comment/compare/v3.6.0...v3.7.0) (2026-03-14)
+
+
+### Features
+
+* add file attachments via artifacts ([#165](https://github.com/mshick/add-pr-comment/issues/165)) ([678e340](https://github.com/mshick/add-pr-comment/commit/678e3402d584de30a0fd466ffaf959f48b20cedc))
+
+## [3.6.0](https://github.com/mshick/add-pr-comment/compare/v3.5.0...v3.6.0) (2026-03-13)
+
+
+### Features
+
+* add commit comment support ([#163](https://github.com/mshick/add-pr-comment/issues/163)) ([5906ed7](https://github.com/mshick/add-pr-comment/commit/5906ed7b9e50927d804b34b4e43ace2ac43dfca7))
+
+## [3.5.0](https://github.com/mshick/add-pr-comment/compare/v3.4.0...v3.5.0) (2026-03-13)
+
+
+### Features
+
+* add "delete on status" option ([#126](https://github.com/mshick/add-pr-comment/issues/126)) ([adbd107](https://github.com/mshick/add-pr-comment/commit/adbd10702a827c95a3e3fcdaba88eb56c36b3075))
+
+## [3.4.0](https://github.com/mshick/add-pr-comment/compare/v3.3.0...v3.4.0) (2026-03-13)
+
+
+### Features
+
+* enable immutable releases ([#158](https://github.com/mshick/add-pr-comment/issues/158)) ([e9cf45c](https://github.com/mshick/add-pr-comment/commit/e9cf45c7dafb15ef94edf29cfb27e8b08d5e8f2e))
+
+## [3.3.0](https://github.com/mshick/add-pr-comment/compare/v3.2.0...v3.3.0) (2026-03-13)
+
+
+### Features
+
+* modernize build pipeline and CI ([#154](https://github.com/mshick/add-pr-comment/issues/154)) ([8ea01c7](https://github.com/mshick/add-pr-comment/commit/8ea01c73d653c4457e7419447c55b89a18da8ba6))
+
+
+### Bug Fixes
+
+* use app token for release-please ([#156](https://github.com/mshick/add-pr-comment/issues/156)) ([8e2d11b](https://github.com/mshick/add-pr-comment/commit/8e2d11beb5d942e3598037e18b497c3dd219d624))
+
+## [3.2.0](https://github.com/mshick/add-pr-comment/compare/v3.1.0...v3.2.0) (2026-03-13)
+
+### Features
+
+- add retry with exponential backoff for API rate limits ([#149](https://github.com/mshick/add-pr-comment/issues/149)) ([84d6648](https://github.com/mshick/add-pr-comment/commit/84d6648de2d8abd2f0b92fb5a02510967868c7be))
+
+### Bug Fixes
+
+- run build on release-please branch pushes ([#153](https://github.com/mshick/add-pr-comment/issues/153)) ([77e7a3f](https://github.com/mshick/add-pr-comment/commit/77e7a3f23ed676ae99533391acf338c0c6ff7fb3))
+
+## [3.1.0](https://github.com/mshick/add-pr-comment/compare/v3.0.1...v3.1.0) (2026-03-12)
+
+### Features
+
+- allow combining message and message-path inputs ([#144](https://github.com/mshick/add-pr-comment/issues/144)) ([2cf2385](https://github.com/mshick/add-pr-comment/commit/2cf2385bb52bc7b732da9c44e6e165d55e40523a))
+
+### Bug Fixes
+
+- make inputs with defaults not required ([#142](https://github.com/mshick/add-pr-comment/issues/142)) ([a841d0b](https://github.com/mshick/add-pr-comment/commit/a841d0b7b208c749145ca15b7060608f446eb12a))
+
+## [3.0.1](https://github.com/mshick/add-pr-comment/compare/v3.0.0...v3.0.1) (2026-03-12)
+
+### Bug Fixes
+
+- trim message when exceeds maximum characters ([#124](https://github.com/mshick/add-pr-comment/issues/124)) ([a62f3c4](https://github.com/mshick/add-pr-comment/commit/a62f3c4273107d031c45e0f419476b909ab7af51))
+
+## [3.0.0](https://github.com/mshick/add-pr-comment/compare/v2.8.2...v3.0.0) (2026-03-12)
+
+### ⚠ BREAKING CHANGES
+
+- update to node24 ([#135](https://github.com/mshick/add-pr-comment/issues/135))
+
+### Features
+
+- update to node24 ([#135](https://github.com/mshick/add-pr-comment/issues/135)) ([4bdb209](https://github.com/mshick/add-pr-comment/commit/4bdb2090ef24b224c52d12011c0cd1dcc472633d))
