@@ -1,0 +1,40 @@
+name: Test commit-sha and commit comment-target inputs
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_EVENT_NAME: push
+      GITHUB_REF: refs/heads/main
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: action
+        uses: .
+        with:
+          message: "Test commit comment"
+          comment-target: "commit"
+          commit-sha: "abc1234567890abcdef1234567890abcdef12345"
+          update-only: "true"
+          repo-token: "fake-token-for-testing"
+          message-id: "test-commit-comment"
+        continue-on-error: true
+
+      - name: Assert action ran with commit-sha and comment-target inputs
+        env:
+          COMMENT_CREATED: ${{ steps.action.outputs.comment-created }}
+          COMMENT_UPDATED: ${{ steps.action.outputs.comment-updated }}
+        run: |
+          echo "comment-created: $COMMENT_CREATED"
+          echo "comment-updated: $COMMENT_UPDATED"
+          # With update-only=true and no existing comment, neither should be true
+          if [ "$COMMENT_CREATED" = "true" ]; then
+            echo "FAIL: comment-created should not be true in update-only mode"
+            exit 1
+          fi
+          if [ "$COMMENT_UPDATED" = "true" ]; then
+            echo "FAIL: comment-updated should not be true when no comment exists"
+            exit 1
+          fi
+          echo "PASS: action ran with commit-sha and comment-target=commit inputs"

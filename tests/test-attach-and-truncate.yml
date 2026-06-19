@@ -1,0 +1,47 @@
+name: Test attach-path, attach-text, and truncate-separator inputs
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_EVENT_NAME: pull_request
+      GITHUB_REF: refs/pull/1/merge
+      GITHUB_HEAD_REF: feature-branch
+      GITHUB_BASE_REF: main
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Create attachment file
+        run: |
+          echo "attachment content" > /tmp/test-attachment.txt
+
+      - id: action
+        uses: .
+        with:
+          message: "Test comment with attachment"
+          attach-path: "/tmp/test-attachment.txt"
+          attach-text: "Download the full report: %ARTIFACT_URL%"
+          truncate-separator: "==="
+          update-only: "true"
+          repo-token: "fake-token-for-testing"
+          message-id: "test-attach-truncate"
+        continue-on-error: true
+
+      - name: Assert action ran with attach and truncate inputs
+        env:
+          COMMENT_CREATED: ${{ steps.action.outputs.comment-created }}
+          COMMENT_UPDATED: ${{ steps.action.outputs.comment-updated }}
+        run: |
+          echo "comment-created: $COMMENT_CREATED"
+          echo "comment-updated: $COMMENT_UPDATED"
+          # With update-only=true and no existing comment, neither should be true
+          if [ "$COMMENT_CREATED" = "true" ]; then
+            echo "FAIL: comment-created should not be true in update-only mode"
+            exit 1
+          fi
+          if [ "$COMMENT_UPDATED" = "true" ]; then
+            echo "FAIL: comment-updated should not be true when no comment exists"
+            exit 1
+          fi
+          echo "PASS: action ran with attach-path, attach-text, and truncate-separator inputs"

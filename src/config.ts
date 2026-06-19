@@ -1,0 +1,116 @@
+import * as core from '@actions/core'
+import * as github from '@actions/github'
+import type { Inputs, MinimizeReason } from './types.js'
+
+const MINIMIZE_REASONS = [
+  'ABUSE',
+  'DUPLICATE',
+  'OFF_TOPIC',
+  'OUTDATED',
+  'RESOLVED',
+  'SPAM',
+] as const
+
+function normalizeMinimizeReason(input: string): MinimizeReason {
+  const normalized = input.trim().toUpperCase().replace(/-/g, '_')
+  if (!(MINIMIZE_REASONS as readonly string[]).includes(normalized)) {
+    throw new Error(
+      `Invalid minimize-reason: "${input}". Must be one of: outdated, resolved, off-topic, duplicate, spam, abuse.`,
+    )
+  }
+  return normalized as MinimizeReason
+}
+
+export async function getInputs(): Promise<Inputs> {
+  const messageIdInput = core.getInput('message-id', { required: false })
+  const messageId = messageIdInput === '' ? 'add-pr-comment' : `add-pr-comment:${messageIdInput}`
+  const attachPath = core.getInput('attach-path', { required: false })
+  const attachName = core.getInput('attach-name', { required: false }) || 'pr-comment-attachments'
+  const attachText =
+    core.getInput('attach-text', { required: false }) ||
+    '**Attachments:** [%ATTACH_NAME%](%ARTIFACT_URL%)'
+  const messageInput = core.getInput('message', { required: false })
+  const messagePath = core.getInput('message-path', { required: false })
+  const messageFind = core.getMultilineInput('find', { required: false })
+  const messageReplace = core.getMultilineInput('replace', { required: false })
+  const repoOwner = core.getInput('repo-owner', { required: false })
+  const repoName = core.getInput('repo-name', { required: false })
+  const repoToken = core.getInput('repo-token', { required: false })
+  const status = core.getInput('status', { required: false })
+  const issue = core.getInput('issue', { required: false })
+  const proxyUrl = core.getInput('proxy-url', { required: false }).replace(/\/$/, '')
+  const allowRepeats = core.getInput('allow-repeats', { required: false }) === 'true'
+  const refreshMessagePosition =
+    core.getInput('refresh-message-position', { required: false }) === 'true'
+  const updateOnly = core.getInput('update-only', { required: false }) === 'true'
+  const preformatted = core.getInput('preformatted', { required: false }) === 'true'
+  const templateVariables = core.getInput('template-variables', { required: false }) === 'true'
+  const truncateInput = core.getInput('truncate', { required: false }) || 'artifact'
+  if (truncateInput !== 'artifact' && truncateInput !== 'simple') {
+    throw new Error(`Invalid truncate mode: "${truncateInput}". Must be "artifact" or "simple".`)
+  }
+  const truncate = truncateInput as 'artifact' | 'simple'
+  const truncateSeparator = core.getInput('truncate-separator', { required: false })
+  const deleteOnStatus = core.getInput('delete-on-status', { required: false })
+
+  const createMinimized = core.getInput('create-minimized', { required: false }) === 'true'
+
+  const deleteMethodInput = core.getInput('delete-method', { required: false }) || 'delete'
+  if (deleteMethodInput !== 'delete' && deleteMethodInput !== 'minimize') {
+    throw new Error(
+      `Invalid delete-method: "${deleteMethodInput}". Must be "delete" or "minimize".`,
+    )
+  }
+  const deleteMethod = deleteMethodInput as 'delete' | 'minimize'
+
+  const minimizeReasonInput = core.getInput('minimize-reason', { required: false }) || 'outdated'
+  const minimizeReason = normalizeMinimizeReason(minimizeReasonInput)
+
+  const commentTarget = core.getInput('comment-target', { required: false }) || 'pr'
+  if (commentTarget !== 'pr' && commentTarget !== 'commit') {
+    throw new Error(`Invalid comment-target: "${commentTarget}". Must be "pr" or "commit".`)
+  }
+  const commitShaInput = core.getInput('commit-sha', { required: false })
+
+  const messageSuccess = core.getInput(`message-success`)
+  const messageFailure = core.getInput(`message-failure`)
+  const messageCancelled = core.getInput(`message-cancelled`)
+  const messageSkipped = core.getInput(`message-skipped`)
+
+  const { payload } = github.context
+
+  return {
+    allowRepeats,
+    attachName,
+    attachPath,
+    attachText,
+    commentTarget: commentTarget as 'pr' | 'commit',
+    commitSha: commitShaInput || github.context.sha,
+    issue: issue ? Number(issue) : payload.issue?.number,
+    messageInput,
+    messageId: `<!-- ${messageId} -->`,
+    messageSuccess,
+    messageFailure,
+    messageCancelled,
+    messageSkipped,
+    messagePath,
+    messageFind,
+    messageReplace,
+    preformatted,
+    templateVariables,
+    truncate,
+    truncateSeparator: truncateSeparator || undefined,
+    proxyUrl,
+    pullRequestNumber: payload.pull_request?.number,
+    refreshMessagePosition,
+    repoToken,
+    status,
+    owner: repoOwner || payload.repo.owner,
+    repo: repoName || payload.repo.repo,
+    updateOnly: updateOnly,
+    deleteOnStatus,
+    createMinimized,
+    deleteMethod,
+    minimizeReason,
+  }
+}
