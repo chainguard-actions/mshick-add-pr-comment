@@ -1,4 +1,4 @@
-name: Test message from file path
+name: Test status-based message override
 on:
   workflow_dispatch:
 jobs:
@@ -7,16 +7,13 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - name: Create message file
-        run: |
-          echo "## Test Report" > /tmp/test-message.md
-          echo "This is a test message from a file." >> /tmp/test-message.md
-
       - id: action
         uses: .
         continue-on-error: true
         with:
-          message-path: /tmp/test-message.md
+          message-success: "✅ Build succeeded!"
+          message-failure: "❌ Build failed!"
+          status: success
           repo-token: ${{ github.token }}
 
       - name: Assert action ran (comment created or failed gracefully on sentinel repo)
