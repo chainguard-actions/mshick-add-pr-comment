@@ -1,0 +1,125 @@
+name: CI
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+permissions: {}
+
+jobs:
+  pr-title:
+    name: PR Title
+    runs-on: ubuntu-slim
+    permissions:
+      pull-requests: read
+    steps:
+      - uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
+        with:
+          node-version-file: "package.json"
+
+      - name: Install Dependencies
+        run: |
+          npm ci
+
+      - name: Check Lint and Formatting
+        run: npm run lint
+
+      - name: Check Types
+        run: npm run check
+
+      - name: Build Action
+        run: |
+          npm run build
+
+      - name: Run Tests
+        run: |
+          npm test
+
+  dogfood:
+    name: Dogfood
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
+        with:
+          node-version-file: "package.json"
+
+      - name: Install Dependencies
+        run: |
+          npm ci
+
+      - name: Build Action
+        run: |
+          npm run build
+
+      - uses: ./
+        with:
+          preformatted: true
+          message-id: path
+          message-path: |
+            .github/test/file-*.txt
+
+      - uses: ./
+        with:
+          message-id: text
+          message: |
+            **Hello**
+            🌏
+            !
+          attach-path: .github/test/file-*.txt
+          attach-name: dogfood-files
+
+      - uses: ./
+        with:
+          template-variables: true
+          message-id: text
+          find: |
+            Hello
+            🌏
+            !
+          replace: |
+            Goodnight
+            🌕
+            <sub>Updated at `%NOW:HH:mm:ss%`</sub>
+
+      - name: Check for dogfood commit
+        id: dogfood-check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPOSITORY: ${{ github.repository }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          MSG=$(gh api "repos/$GH_REPOSITORY/commits/$PR_HEAD_SHA" --jq '.commit.message | split("\n") | .[0]')
+          if [[ "$MSG" == dogfood:* ]]; then
+            echo "match=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: ./
+        if: steps.dogfood-check.outputs.match == 'true'
+        with:
+          comment-target: commit
+          commit-sha: ${{ github.event.pull_request.head.sha }}
+          message: "ruff 🐶"

@@ -1,4 +1,4 @@
-name: Test delete-on-status input
+name: Test attach-path and attach-text inputs
 on:
   workflow_dispatch:
 jobs:
@@ -13,12 +13,17 @@ jobs:
           echo "owner=$(echo "$GITHUB_REPOSITORY" | cut -d'/' -f1)" >> "$GITHUB_OUTPUT"
           echo "name=$(echo "$GITHUB_REPOSITORY" | cut -d'/' -f2)" >> "$GITHUB_OUTPUT"
 
+      - name: Create a file to attach
+        run: |
+          echo "This is an attachment file for testing." > /tmp/test-attachment.txt
+
       - id: action
         uses: .
         with:
-          message: "Test comment for delete-on-status"
-          delete-on-status: "failure"
-          status: "success"
+          message: "See attached file for details."
+          attach-path: "/tmp/test-attachment.txt"
+          attach-text: "📎 Download the full report: %ARTIFACT_URL%"
+          attach-name: "act-test-attachments"
           repo-owner: ${{ steps.repo.outputs.owner }}
           repo-name: ${{ steps.repo.outputs.name }}
           # update-only=true: only update if a comment already exists.
@@ -28,7 +33,7 @@ jobs:
           update-only: "true"
           allow-repeats: "true"
           issue: "1"
-          message-id: "act-test-delete-on-status"
+          message-id: "act-test-attach-options"
 
       - name: Assert comment-created is false
         env:
@@ -39,4 +44,4 @@ jobs:
             echo "FAIL: expected comment-created=false when update-only=true and no existing comment, got: $COMMENT_CREATED"
             exit 1
           fi
-          echo "PASS: delete-on-status input accepted, comment-created=false as expected"
+          echo "PASS: attach-path and attach-text inputs accepted, comment-created=false as expected"

@@ -1,4 +1,4 @@
-name: Test delete-on-status input
+name: Test commit-sha input for commit comments
 on:
   workflow_dispatch:
 jobs:
@@ -7,28 +7,28 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - name: Extract repo info
+      - name: Extract repo info and current SHA
         id: repo
         run: |
           echo "owner=$(echo "$GITHUB_REPOSITORY" | cut -d'/' -f1)" >> "$GITHUB_OUTPUT"
           echo "name=$(echo "$GITHUB_REPOSITORY" | cut -d'/' -f2)" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - id: action
         uses: .
         with:
-          message: "Test comment for delete-on-status"
-          delete-on-status: "failure"
-          status: "success"
+          message: "Test commit comment with explicit SHA"
+          comment-target: "commit"
+          commit-sha: ${{ steps.repo.outputs.sha }}
           repo-owner: ${{ steps.repo.outputs.owner }}
           repo-name: ${{ steps.repo.outputs.name }}
           # update-only=true: only update if a comment already exists.
-          # allow-repeats=true: skip the getExisting API call.
+          # allow-repeats=true: skip the getExistingCommitComment API call.
           # With existingComment=undefined and update-only=true, the action sets
           # comment-created=false and exits without making any write API calls.
           update-only: "true"
           allow-repeats: "true"
-          issue: "1"
-          message-id: "act-test-delete-on-status"
+          message-id: "act-test-commit-sha"
 
       - name: Assert comment-created is false
         env:
@@ -39,4 +39,4 @@ jobs:
             echo "FAIL: expected comment-created=false when update-only=true and no existing comment, got: $COMMENT_CREATED"
             exit 1
           fi
-          echo "PASS: delete-on-status input accepted, comment-created=false as expected"
+          echo "PASS: commit-sha input accepted, comment-created=false as expected"

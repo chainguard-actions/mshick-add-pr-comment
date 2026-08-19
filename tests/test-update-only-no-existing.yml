@@ -1,4 +1,4 @@
-name: Test commit comment creation
+name: Test update-only with no existing comment
 on:
   workflow_dispatch:
 jobs:
@@ -16,25 +16,25 @@ jobs:
       - id: action
         uses: .
         with:
-          message: "Test commit comment from act test suite"
-          comment-target: "commit"
+          message: "This should not be posted"
           repo-owner: ${{ steps.repo.outputs.owner }}
           repo-name: ${{ steps.repo.outputs.name }}
-          # update-only=true: only update if a comment already exists.
-          # allow-repeats=true: skip the getExistingCommitComment API call.
-          # With existingComment=undefined and update-only=true, the action sets
-          # comment-created=false and exits without making any write API calls.
           update-only: "true"
+          # allow-repeats=true skips the getExisting API call (existingComment stays undefined).
+          # With existingComment=undefined and update-only=true, the action sets
+          # comment-created=false and exits without creating a comment.
+          # issue=1 avoids the listPullRequestsAssociatedWithCommit API call.
           allow-repeats: "true"
-          message-id: "act-test-commit-comment"
+          issue: "1"
+          message-id: "act-test-update-only-no-existing"
 
-      - name: Assert comment-created is false (no existing comment to update)
+      - name: Assert comment-created is false
         env:
           COMMENT_CREATED: ${{ steps.action.outputs.comment-created }}
         run: |
           echo "comment-created: $COMMENT_CREATED"
           if [ "$COMMENT_CREATED" != "false" ]; then
-            echo "FAIL: expected comment-created=false for commit comment with update-only=true and no existing comment, got: $COMMENT_CREATED"
+            echo "FAIL: expected comment-created=false with update-only=true and no existing comment, got: $COMMENT_CREATED"
             exit 1
           fi
           echo "PASS: comment-created=false as expected"

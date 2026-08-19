@@ -1,4 +1,4 @@
-name: Test delete-on-status input
+name: Test no PR context (graceful exit)
 on:
   workflow_dispatch:
 jobs:
@@ -16,19 +16,18 @@ jobs:
       - id: action
         uses: .
         with:
-          message: "Test comment for delete-on-status"
-          delete-on-status: "failure"
-          status: "success"
+          message: "Hello from test"
           repo-owner: ${{ steps.repo.outputs.owner }}
           repo-name: ${{ steps.repo.outputs.name }}
           # update-only=true: only update if a comment already exists.
-          # allow-repeats=true: skip the getExisting API call.
+          # allow-repeats=true: skip the getExisting API call (existingComment stays undefined).
           # With existingComment=undefined and update-only=true, the action sets
           # comment-created=false and exits without making any write API calls.
+          # issue=1 avoids the listPullRequestsAssociatedWithCommit API call.
           update-only: "true"
           allow-repeats: "true"
           issue: "1"
-          message-id: "act-test-delete-on-status"
+          message-id: "act-test-no-pr-context"
 
       - name: Assert comment-created is false
         env:
@@ -39,4 +38,4 @@ jobs:
             echo "FAIL: expected comment-created=false when update-only=true and no existing comment, got: $COMMENT_CREATED"
             exit 1
           fi
-          echo "PASS: delete-on-status input accepted, comment-created=false as expected"
+          echo "PASS: comment-created=false as expected"

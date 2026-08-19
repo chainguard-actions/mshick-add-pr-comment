@@ -4,42 +4,46 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      GITHUB_EVENT_NAME: pull_request
-      GITHUB_REF: refs/pull/1/merge
-      GITHUB_HEAD_REF: feature-branch
-      GITHUB_BASE_REF: main
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
+      - name: Extract repo info
+        id: repo
+        run: |
+          echo "owner=$(echo "$GITHUB_REPOSITORY" | cut -d'/' -f1)" >> "$GITHUB_OUTPUT"
+          echo "name=$(echo "$GITHUB_REPOSITORY" | cut -d'/' -f2)" >> "$GITHUB_OUTPUT"
+
       - name: Create message file
         run: |
-          echo "# Test Comment from File" > /tmp/test-message.md
-          echo "This is a test message loaded from a file." >> /tmp/test-message.md
+          echo "## Test Message from File" > /tmp/pr-message.md
+          echo "" >> /tmp/pr-message.md
+          echo "This message was loaded from a file path." >> /tmp/pr-message.md
 
       - id: action
         uses: .
         with:
-          message-path: "/tmp/test-message.md"
+          message-path: "/tmp/pr-message.md"
+          repo-owner: ${{ steps.repo.outputs.owner }}
+          repo-name: ${{ steps.repo.outputs.name }}
+          # update-only=true: only update if a comment already exists.
+          # allow-repeats=true: skip the getExisting API call (existingComment stays undefined).
+          # With existingComment=undefined and update-only=true, the action sets
+          # comment-created=false and exits without making any write API calls.
+          # issue=1 avoids the listPullRequestsAssociatedWithCommit API call.
           update-only: "true"
-          repo-token: "fake-token-for-testing"
-          message-id: "test-message-path"
-        continue-on-error: true
+          allow-repeats: "true"
+          issue: "1"
+          message-id: "act-test-message-path"
 
-      - name: Assert action ran with message-path
+      - name: Assert action completed without error
         env:
           COMMENT_CREATED: ${{ steps.action.outputs.comment-created }}
-          COMMENT_UPDATED: ${{ steps.action.outputs.comment-updated }}
         run: |
           echo "comment-created: $COMMENT_CREATED"
-          echo "comment-updated: $COMMENT_UPDATED"
-          # With update-only=true and no existing comment, neither should be true
-          if [ "$COMMENT_CREATED" = "true" ]; then
-            echo "FAIL: comment-created should not be true in update-only mode"
+          # With update-only=true and allow-repeats=true, no existing comment is found,
+          # so comment-created=false regardless of PR context.
+          if [ "$COMMENT_CREATED" != "false" ]; then
+            echo "FAIL: expected comment-created=false when update-only=true and no existing comment, got: $COMMENT_CREATED"
             exit 1
           fi
-          if [ "$COMMENT_UPDATED" = "true" ]; then
-            echo "FAIL: comment-updated should not be true when no comment exists"
-            exit 1
-          fi
-          echo "PASS: action ran with message-path in update-only mode"
+          echo "PASS: action handled message-path gracefully"
