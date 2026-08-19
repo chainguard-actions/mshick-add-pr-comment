@@ -1,4 +1,4 @@
-name: Test find and replace inputs
+name: Test preformatted message in codeblock
 on:
   workflow_dispatch:
 jobs:
@@ -11,25 +11,26 @@ jobs:
         uses: .
         continue-on-error: true
         with:
-          message: "Hello PLACEHOLDER world"
-          find: "PLACEHOLDER"
-          replace: "beautiful"
-          repo-token: ${{ github.token }}
-          issue: "1"
+          message: |
+            key: value
+            another_key: another_value
+          preformatted: "true"
+          message-id: "test-preformatted"
+          allow-repeats: "true"
 
-      - name: Assert action ran (find and replace inputs accepted)
+      - name: Assert action ran with preformatted message
         env:
           OUTCOME: ${{ steps.action.outcome }}
           COMMENT_CREATED: ${{ steps.action.outputs.comment-created }}
-          COMMENT_UPDATED: ${{ steps.action.outputs.comment-updated }}
+          COMMENT_ID: ${{ steps.action.outputs.comment-id }}
         run: |
           echo "outcome: $OUTCOME"
           echo "comment-created: $COMMENT_CREATED"
-          echo "comment-updated: $COMMENT_UPDATED"
+          echo "comment-id: $COMMENT_ID"
           if [ "$OUTCOME" = "success" ]; then
-            echo "PASS: action succeeded"
+            echo "PASS: action succeeded with preformatted message"
           elif [ "$OUTCOME" = "failure" ]; then
-            echo "PASS: action failed gracefully (sentinel repo is not resolvable)"
+            echo "PASS: action failed gracefully (no PR context or sentinel repo)"
           else
             echo "FAIL: unexpected outcome '$OUTCOME'"
             exit 1
