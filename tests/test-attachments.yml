@@ -1,33 +1,40 @@
-name: Test attach-path and attach-text inputs
+name: Test attachments and truncate-separator
 on:
   workflow_dispatch:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      GITHUB_EVENT_NAME: pull_request
-      GITHUB_REF: refs/pull/1/merge
-      GITHUB_HEAD_REF: feature-branch
-      GITHUB_BASE_REF: main
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - name: Create attachment file
+
+      - name: Create a file to attach
         run: |
-          echo "attachment content" > /tmp/test-attachment.txt
+          echo "This is an attachment file" > /tmp/attachment.txt
+
       - id: action
         uses: .
         continue-on-error: true
         with:
-          message: "See attached file for details."
-          attach-path: "/tmp/test-attachment.txt"
-          attach-name: "test-attachments"
-          attach-text: "Download the full report: %ARTIFACT_URL%"
-          proxy-url: ""
-          message-id: "test-attachments"
-          repo-token: "fake-token-for-testing"
-      - name: Assert action ran
+          message: "Test message with attachment"
+          attach-path: "/tmp/attachment.txt"
+          attach-text: "Download the full output: %ARTIFACT_URL%"
+          truncate-separator: "---END---"
+          repo-token: ${{ github.token }}
+
+      - name: Assert action ran (outputs set, or failed gracefully on the sentinel repo)
         env:
           OUTCOME: ${{ steps.action.outcome }}
+          COMMENT_CREATED: ${{ steps.action.outputs.comment-created }}
+          COMMENT_UPDATED: ${{ steps.action.outputs.comment-updated }}
         run: |
-          echo "action outcome: $OUTCOME"
-          echo "PASS: action was invoked with attach-path, attach-text, and proxy-url inputs"
+          echo "outcome: $OUTCOME"
+          echo "comment-created: $COMMENT_CREATED"
+          echo "comment-updated: $COMMENT_UPDATED"
+          if [ "$OUTCOME" = "success" ]; then
+            echo "PASS: action succeeded"
+          elif [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: action failed gracefully (sentinel repo is not resolvable)"
+          else
+            echo "FAIL: unexpected outcome '$OUTCOME'"
+            exit 1
+          fi

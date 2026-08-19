@@ -1,4 +1,4 @@
-name: Test find and replace with issue override
+name: Test delete-on-status and status message overrides
 on:
   workflow_dispatch:
 jobs:
@@ -11,10 +11,10 @@ jobs:
         uses: .
         continue-on-error: true
         with:
-          message: "Hello WORLD, this is a test."
-          find: "WORLD"
-          replace: "GitHub"
-          issue: "1"
+          message: "Test message for delete-on-status"
+          delete-on-status: "cancelled"
+          message-cancelled: "The workflow was cancelled."
+          message-skipped: "The workflow was skipped."
           repo-token: ${{ github.token }}
 
       - name: Assert action ran (outputs set, or failed gracefully on the sentinel repo)
