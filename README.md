@@ -12,7 +12,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 | v3.10.1 | [`v3.10.1`](https://github.com/chainguard-actions/mshick-add-pr-comment/tree/v3.10.1) | [`be5d48d`](https://github.com/mshick/add-pr-comment/commit/be5d48d9b695983ee841f45434104a1419ba6231) |
 | v3.11.0 | [`v3.11.0`](https://github.com/chainguard-actions/mshick-add-pr-comment/tree/v3.11.0) | — |
 | v3.12.0 | [`v3.12.0`](https://github.com/chainguard-actions/mshick-add-pr-comment/tree/v3.12.0) | [`ec328af`](https://github.com/mshick/add-pr-comment/commit/ec328af66588ab8f77cdeb2c264f14aba45bbf59) |
-| v3.9.0 | [`v3.9.0`](https://github.com/chainguard-actions/mshick-add-pr-comment/tree/v3.9.0) | — |
+| v3.9.0 | [`v3.9.0`](https://github.com/chainguard-actions/mshick-add-pr-comment/tree/v3.9.0) | [`ffd016c`](https://github.com/mshick/add-pr-comment/commit/ffd016c7e151d97d69d21a843022fd4cd5b96fe5) |
 | v3.9.1 | [`v3.9.1`](https://github.com/chainguard-actions/mshick-add-pr-comment/tree/v3.9.1) | — |
 
 ## Privacy
