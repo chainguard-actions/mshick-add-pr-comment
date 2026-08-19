@@ -1,4 +1,4 @@
-name: Test status-based messages
+name: Test allow-repeats with message-id
 on:
   workflow_dispatch:
 jobs:
@@ -11,13 +11,12 @@ jobs:
         uses: .
         continue-on-error: true
         with:
-          message-success: "Build succeeded!"
-          message-failure: "Build failed!"
-          message-cancelled: "Build was cancelled."
-          status: "success"
+          message: "Repeated message test"
+          message-id: "my-unique-message-id"
+          allow-repeats: "true"
           repo-token: ${{ github.token }}
 
-      - name: Assert action ran with status messages or failed gracefully
+      - name: Assert action ran with allow-repeats or failed gracefully
         env:
           OUTCOME: ${{ steps.action.outcome }}
           COMMENT_CREATED: ${{ steps.action.outputs.comment-created }}
@@ -27,7 +26,7 @@ jobs:
           echo "comment-created: $COMMENT_CREATED"
           echo "comment-id: $COMMENT_ID"
           if [ "$OUTCOME" = "success" ]; then
-            echo "PASS: action succeeded with status-based message"
+            echo "PASS: action succeeded with allow-repeats enabled"
           elif [ "$OUTCOME" = "failure" ]; then
             echo "PASS: action failed gracefully (sentinel repo or no PR context)"
           else
