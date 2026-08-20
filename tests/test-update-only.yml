@@ -1,4 +1,4 @@
-name: Test message from file path
+name: Test update-only mode
 on:
   workflow_dispatch:
 jobs:
@@ -6,33 +6,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - name: Create message file
-        run: |
-          echo "This is a message from a file." > /tmp/test-message.md
-          echo "It has multiple lines." >> /tmp/test-message.md
       - id: action
         uses: .
         continue-on-error: true
         with:
-          message-path: "/tmp/test-message.md"
-          message-id: "test-message-path"
+          message: "Update-only test message"
+          message-id: "test-update-only"
+          update-only: "true"
           repo-token: ${{ github.token }}
       - name: Assert action ran or failed gracefully
         env:
           OUTCOME: ${{ steps.action.outcome }}
           COMMENT_CREATED: ${{ steps.action.outputs.comment-created }}
-          COMMENT_ID: ${{ steps.action.outputs.comment-id }}
+          COMMENT_UPDATED: ${{ steps.action.outputs.comment-updated }}
         run: |
           echo "outcome: $OUTCOME"
           echo "comment-created: $COMMENT_CREATED"
-          echo "comment-id: $COMMENT_ID"
+          echo "comment-updated: $COMMENT_UPDATED"
           if [ "$OUTCOME" = "success" ]; then
-            echo "Action succeeded reading message from file"
-            if [ -z "$COMMENT_CREATED" ]; then
-              echo "FAIL: comment-created output is not set"
+            echo "Action succeeded in update-only mode"
+            # In update-only mode with no existing comment, comment-created should be false
+            if [ "$COMMENT_CREATED" = "true" ]; then
+              echo "FAIL: comment-created should not be true in update-only mode with no existing comment"
               exit 1
             fi
-            echo "PASS: message-path mode ran successfully"
+            echo "PASS: update-only mode behaved correctly"
           elif [ "$OUTCOME" = "failure" ]; then
             echo "PASS: action failed gracefully (sentinel repo is not resolvable)"
           else

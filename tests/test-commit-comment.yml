@@ -1,12 +1,9 @@
-name: Test commit comment inputs
+name: Test commit comment target
 on:
   workflow_dispatch:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      GITHUB_EVENT_NAME: push
-      GITHUB_REF: refs/heads/main
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - id: action
@@ -14,13 +11,29 @@ jobs:
         continue-on-error: true
         with:
           message: "Commit comment test"
-          comment-target: "commit"
-          commit-sha: "abc1234567890abcdef1234567890abcdef12345"
           message-id: "test-commit-comment"
-          allow-repeats: "true"
-          repo-token: "fake-token-for-testing"
-      - name: Assert action ran
+          comment-target: "commit"
+          commit-sha: ${{ github.sha }}
+          repo-token: ${{ github.token }}
+      - name: Assert action ran or failed gracefully
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+          COMMENT_CREATED: ${{ steps.action.outputs.comment-created }}
+          COMMENT_ID: ${{ steps.action.outputs.comment-id }}
         run: |
-          echo "Action completed (may fail due to no real GitHub API)"
-          echo "comment-created: ${{ steps.action.outputs.comment-created }}"
-          echo "PASS"
+          echo "outcome: $OUTCOME"
+          echo "comment-created: $COMMENT_CREATED"
+          echo "comment-id: $COMMENT_ID"
+          if [ "$OUTCOME" = "success" ]; then
+            echo "Action succeeded in commit comment mode"
+            if [ -z "$COMMENT_CREATED" ]; then
+              echo "FAIL: comment-created output is not set"
+              exit 1
+            fi
+            echo "PASS: commit comment mode ran successfully with comment-created='$COMMENT_CREATED'"
+          elif [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: action failed gracefully (sentinel repo is not resolvable)"
+          else
+            echo "FAIL: unexpected outcome '$OUTCOME'"
+            exit 1
+          fi

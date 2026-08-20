@@ -1,4 +1,4 @@
-name: Test message from file path
+name: Test allow-repeats flag
 on:
   workflow_dispatch:
 jobs:
@@ -6,33 +6,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - name: Create message file
-        run: |
-          echo "This is a message from a file." > /tmp/test-message.md
-          echo "It has multiple lines." >> /tmp/test-message.md
       - id: action
         uses: .
         continue-on-error: true
         with:
-          message-path: "/tmp/test-message.md"
-          message-id: "test-message-path"
+          message: "Repeated message test"
+          message-id: "test-allow-repeats"
+          allow-repeats: "true"
           repo-token: ${{ github.token }}
       - name: Assert action ran or failed gracefully
         env:
           OUTCOME: ${{ steps.action.outcome }}
           COMMENT_CREATED: ${{ steps.action.outputs.comment-created }}
-          COMMENT_ID: ${{ steps.action.outputs.comment-id }}
+          COMMENT_UPDATED: ${{ steps.action.outputs.comment-updated }}
         run: |
           echo "outcome: $OUTCOME"
           echo "comment-created: $COMMENT_CREATED"
-          echo "comment-id: $COMMENT_ID"
+          echo "comment-updated: $COMMENT_UPDATED"
           if [ "$OUTCOME" = "success" ]; then
-            echo "Action succeeded reading message from file"
-            if [ -z "$COMMENT_CREATED" ]; then
-              echo "FAIL: comment-created output is not set"
+            echo "Action succeeded — verifying outputs are set"
+            if [ -z "$COMMENT_CREATED" ] && [ -z "$COMMENT_UPDATED" ]; then
+              echo "FAIL: neither comment-created nor comment-updated is set"
               exit 1
             fi
-            echo "PASS: message-path mode ran successfully"
+            echo "PASS: action succeeded with allow-repeats=true"
           elif [ "$OUTCOME" = "failure" ]; then
             echo "PASS: action failed gracefully (sentinel repo is not resolvable)"
           else
