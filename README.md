@@ -10,7 +10,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 |---------|-----|-----------------|
 | v3.10.0 | [`v3.10.0`](https://github.com/chainguard-actions/mshick-add-pr-comment/tree/v3.10.0) | [`64b8e91`](https://github.com/mshick/add-pr-comment/commit/64b8e914979889d746c99dea15a76e77ef64580a) |
 | v3.10.1 | [`v3.10.1`](https://github.com/chainguard-actions/mshick-add-pr-comment/tree/v3.10.1) | [`be5d48d`](https://github.com/mshick/add-pr-comment/commit/be5d48d9b695983ee841f45434104a1419ba6231) |
-| v3.11.0 | [`v3.11.0`](https://github.com/chainguard-actions/mshick-add-pr-comment/tree/v3.11.0) | — |
+| v3.11.0 | [`v3.11.0`](https://github.com/chainguard-actions/mshick-add-pr-comment/tree/v3.11.0) | [`8e49278`](https://github.com/mshick/add-pr-comment/commit/8e4927817251f1ff60c001f04568532b38e0b4a0) |
 | v3.12.0 | [`v3.12.0`](https://github.com/chainguard-actions/mshick-add-pr-comment/tree/v3.12.0) | [`ec328af`](https://github.com/mshick/add-pr-comment/commit/ec328af66588ab8f77cdeb2c264f14aba45bbf59) |
 | v3.9.0 | [`v3.9.0`](https://github.com/chainguard-actions/mshick-add-pr-comment/tree/v3.9.0) | [`ffd016c`](https://github.com/mshick/add-pr-comment/commit/ffd016c7e151d97d69d21a843022fd4cd5b96fe5) |
 | v3.9.1 | [`v3.9.1`](https://github.com/chainguard-actions/mshick-add-pr-comment/tree/v3.9.1) | [`f102bb3`](https://github.com/mshick/add-pr-comment/commit/f102bb3ebc97eedd4e2a98a9e71e462cc257fe80) |
