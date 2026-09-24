@@ -1,7 +1,0 @@
-{
-  "owner": "mshick",
-  "name": "add-pr-comment",
-  "visibility": "internal",
-  "description": "Add a comment to a pull request or commit",
-  "block_publish": false
-}
