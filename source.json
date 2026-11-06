@@ -4,8 +4,13 @@
   "version": "v3.11.0",
   "commit_sha": "8e4927817251f1ff60c001f04568532b38e0b4a0",
   "url": "https://github.com/mshick/add-pr-comment",
-  "policy_sha": "d636be7e43ef829af6e853da6b3c7566db9f72fe",
+  "policy_sha": "374911c4be584df24e6da57af2d990570ef0f859",
   "test_policy_sha": "843adf9e4b8f85d0c08b27b9d0b09dd094b54702",
   "test_agent_version": "2",
-  "harden_agent_version": "2"
+  "harden_agent_version": "2",
+  "dist_artifact": {
+    "gcs_uri": "gs://patch-actions-node-artifacts/dist-artifacts/mshick/add-pr-comment/v3.11.0/sha256-578730fee8d23619217026a360efc6a59b08b22e3e71543e6b8816496a8a0b79.tar.gz",
+    "sha256": "578730fee8d23619217026a360efc6a59b08b22e3e71543e6b8816496a8a0b79",
+    "size_bytes": 2254137
+  }
 }
